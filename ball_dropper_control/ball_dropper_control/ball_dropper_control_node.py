@@ -148,6 +148,7 @@ class BallDropperControlNode(Node):
         return response
 
     def _handle_close(self, actuator_id: int, request, response):
+        self.get_logger().info(f'Received request to close actuator {actuator_id}.')
         success, message = self.ball_dropper.close_actuator(actuator_id)
         response.success = success
         response.message = message
