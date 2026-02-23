@@ -2,7 +2,7 @@
 
 import os
 
-ACTUATOR_TRAVEL_TIME = 3.0  # seconds for an actuator to fully open or close
+ACTUATOR_TRAVEL_TIME = 1.0  # seconds for an actuator to fully open or close
 
 # GPIO (gpiod) configuration.
 # RETRACT: pulls actuator back (open). EXTEND: pushes forward (close).
