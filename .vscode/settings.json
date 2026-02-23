@@ -1,0 +1,22 @@
+{
+    "ros.distro": "humble",
+    "python.autoComplete.extraPaths": [
+        "/home/alec/ros_ws/install/zed_topic_benchmark_interfaces/local/lib/python3.10/dist-packages",
+        "/home/alec/ros_ws/build/mhsboat_ctrl",
+        "/home/alec/ros_ws/install/mhsboat_ctrl/lib/python3.10/site-packages",
+        "/home/alec/ros_ws/install/direct_lidar_inertial_odometry/local/lib/python3.10/dist-packages",
+        "/home/alec/ros_ws/install/boat_interfaces/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/alec/ros_ws/install/zed_topic_benchmark_interfaces/local/lib/python3.10/dist-packages",
+        "/home/alec/ros_ws/build/mhsboat_ctrl",
+        "/home/alec/ros_ws/install/mhsboat_ctrl/lib/python3.10/site-packages",
+        "/home/alec/ros_ws/install/direct_lidar_inertial_odometry/local/lib/python3.10/dist-packages",
+        "/home/alec/ros_ws/install/boat_interfaces/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "ROS2.distro": "humble"
+}

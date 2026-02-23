@@ -1,0 +1,5 @@
+ball_dropper_state.json
+ball_dropper.lock
+.pytest_cache/
+__pycache__/
+log/

@@ -1,0 +1,30 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/alec/ros_ws/install/zed_ipc/include/**",
+        "/home/alec/ros_ws/install/zed_topic_benchmark_component/include/**",
+        "/home/alec/ros_ws/install/zed_topic_benchmark_interfaces/include/**",
+        "/home/alec/ros_ws/install/zed_rgb_convert/include/**",
+        "/home/alec/ros_ws/install/zed_aruco_localization/include/**",
+        "/home/alec/ros_ws/install/zed_components/include/**",
+        "/home/alec/ros_ws/install/rviz_plugin_zed_od/include/**",
+        "/home/alec/ros_ws/install/direct_lidar_inertial_odometry/include/**",
+        "/home/alec/ros_ws/install/boat_interfaces/include/**",
+        "/opt/ros/humble/include/**",
+        "/home/alec/ros_ws/src/direct_lidar_inertial_odometry/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

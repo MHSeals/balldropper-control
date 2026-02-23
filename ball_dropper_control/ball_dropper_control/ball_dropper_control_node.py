@@ -28,6 +28,7 @@ import json
 import os
 
 import rclpy
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -64,11 +65,16 @@ class BallDropperControlNode(Node):
     def __init__(self):
         super().__init__('ball_dropper_control')
         self._acquire_singleton_lock()
-        self.ball_dropper = BallDropper()
+        self.ball_dropper = BallDropper(on_state_change=self._publish_status)
 
         # Status publisher
+        # Use a dedicated callback group so the timer can fire even while a
+        # service callback is blocking (e.g. during 3-second actuator travel).
+        self._status_cb_group = MutuallyExclusiveCallbackGroup()
         self._status_pub = self.create_publisher(String, 'ball_dropper/status', 10)
-        self._status_timer = self.create_timer(1.0, self._publish_status)
+        self._status_timer = self.create_timer(
+            1.0, self._publish_status, callback_group=self._status_cb_group
+        )
 
         # Drop service
         self._drop_srv = self.create_service(
@@ -176,10 +182,12 @@ def main(args=None):
     try:
         executor.spin()
     except KeyboardInterrupt:
+        print('\rShutting down BallDropperControlNode (KeyboardInterrupt)')
         pass
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == '__main__':

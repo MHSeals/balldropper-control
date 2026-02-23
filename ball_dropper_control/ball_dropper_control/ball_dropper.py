@@ -15,8 +15,14 @@ from .constants import STATE_FILE
 class BallDropper:
     NUM_ACTUATORS = 3
 
-    def __init__(self, state_file: str = STATE_FILE):
+    def __init__(self, state_file: str = STATE_FILE, on_state_change=None):
+        """
+        *on_state_change* is an optional zero-argument callable invoked
+        whenever an actuator state changes (including TRANSITIONING states).
+        Useful for publishing status updates immediately on each transition.
+        """
         self.state_file = state_file
+        self._on_state_change = on_state_change or (lambda: None)
         self._lock = threading.Lock()
 
         if os.path.exists(state_file):
@@ -92,7 +98,11 @@ class BallDropper:
                     f'Rejected: actuator {actuator.actuator_id} is not closed '
                     f'(state={actuator.state.value}).',
                 )
-            actuator.open()
+            def _on_transitioning():
+                self._save_state()
+                self._on_state_change()
+
+            actuator.open(on_transitioning=_on_transitioning)
             self.next_to_drop += 1
             self._save_state()
             return True, f'Ball {self.next_to_drop} dropped via actuator {actuator.actuator_id}.'
@@ -113,7 +123,11 @@ class BallDropper:
             actuator = self.actuators[idx]
             if actuator.state == ActuatorState.CLOSED:
                 return False, f'Rejected: actuator {actuator_id} is already closed.'
-            actuator.close()
+            def _on_transitioning():
+                self._save_state()
+                self._on_state_change()
+
+            actuator.close(on_transitioning=_on_transitioning)
             self._save_state()
             return True, f'Actuator {actuator_id} closed.'
 
