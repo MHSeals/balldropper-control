@@ -107,6 +107,30 @@ class BallDropper:
             self._save_state()
             return True, f'Ball {self.next_to_drop} dropped via actuator {actuator.actuator_id}.'
 
+    def open_actuator(self, actuator_id: int) -> tuple[bool, str]:
+        """
+        Open a specific actuator by 1-based ID.
+        Used by the loading CLI to open all actuators before loading.
+        Blocks for ACTUATOR_TRAVEL_TIME while the actuator travels.
+        Returns (success, message).
+        """
+        with self._lock:
+            if self.is_any_transitioning():
+                return False, 'Rejected: an actuator is currently transitioning.'
+            idx = actuator_id - 1
+            if idx < 0 or idx >= self.NUM_ACTUATORS:
+                return False, f'Rejected: invalid actuator ID {actuator_id}.'
+            actuator = self.actuators[idx]
+            if actuator.state == ActuatorState.OPEN:
+                return True, f'Actuator {actuator_id} is already open.'
+            def _on_transitioning():
+                self._save_state()
+                self._on_state_change()
+
+            actuator.open(on_transitioning=_on_transitioning)
+            self._save_state()
+            return True, f'Actuator {actuator_id} opened.'
+
     def close_actuator(self, actuator_id: int) -> tuple[bool, str]:
         """
         Close a specific actuator by 1-based ID.

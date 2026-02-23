@@ -17,6 +17,9 @@ Publishers:
                                               state change and once per second.
 Services:
     ball_dropper/drop_ball          (std_srvs/Trigger) — open next actuator.
+    ball_dropper/open_actuator_1    (std_srvs/Trigger) — open actuator 1.
+    ball_dropper/open_actuator_2    (std_srvs/Trigger) — open actuator 2.
+    ball_dropper/open_actuator_3    (std_srvs/Trigger) — open actuator 3.
     ball_dropper/close_actuator_1   (std_srvs/Trigger) — close actuator 1.
     ball_dropper/close_actuator_2   (std_srvs/Trigger) — close actuator 2.
     ball_dropper/close_actuator_3   (std_srvs/Trigger) — close actuator 3.
@@ -80,6 +83,16 @@ class BallDropperControlNode(Node):
         self._drop_srv = self.create_service(
             Trigger, 'ball_dropper/drop_ball', self._handle_drop
         )
+
+        # Per-actuator open services (used by the load CLI)
+        self._open_srvs = [
+            self.create_service(
+                Trigger,
+                f'ball_dropper/open_actuator_{i}',
+                lambda req, res, aid=i: self._handle_open(aid, req, res),
+            )
+            for i in range(1, 4)
+        ]
 
         # Per-actuator close services (used by the load CLI)
         self._close_srvs = [
@@ -145,6 +158,15 @@ class BallDropperControlNode(Node):
         response.message = message
         self._publish_status()
         self.get_logger().info(f'drop_ball: {message}')
+        return response
+
+    def _handle_open(self, actuator_id: int, request, response):
+        self.get_logger().info(f'Received request to open actuator {actuator_id}.')
+        success, message = self.ball_dropper.open_actuator(actuator_id)
+        response.success = success
+        response.message = message
+        self._publish_status()
+        self.get_logger().info(f'open_actuator_{actuator_id}: {message}')
         return response
 
     def _handle_close(self, actuator_id: int, request, response):

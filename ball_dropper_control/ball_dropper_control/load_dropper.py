@@ -6,7 +6,8 @@ Run this script WHILE the ball_dropper_control node is running:
 
     ros2 run ball_dropper_control load_dropper
 
-Physical loading sequence (bottom to top):
+Physical loading sequence:
+    0. Open all actuators              →  dropper cleared / ready to receive balls
     1. Drop a ball into the open tube  →  close actuator 3  (catches ball at bottom)
     2. Drop a ball into the tube       →  close actuator 2  (catches ball in middle)
     3. Drop a ball into the tube       →  close actuator 1  (catches ball at top)
@@ -26,9 +27,9 @@ from std_srvs.srv import Trigger
 
 # Loading sequence: (actuator_id, user-facing prompt)
 _LOAD_STEPS: list[tuple[int, str]] = [
-    (3, 'Step 1/3 — Drop a ball into the tube (it will fall to the bottom).'),
-    (2, 'Step 2/3 — Drop the next ball into the tube.'),
-    (1, 'Step 3/3 — Drop the final ball into the tube (top position).'),
+    (3, 'Step 1/3 — Drop a ball into the tube (it will fall to the bottom, caught by actuator 3).'),
+    (2, 'Step 2/3 — Drop the next ball into the tube (caught by actuator 2).'),
+    (1, 'Step 3/3 — Drop the final ball into the tube (caught by actuator 1 at the top).'),
 ]
 
 
@@ -44,6 +45,10 @@ class LoadDropperCLI(Node):
     def __init__(self):
         super().__init__('load_dropper_cli')
 
+        self._open_clients: dict[int, rclpy.client.Client] = {
+            i: self.create_client(Trigger, f'ball_dropper/open_actuator_{i}')
+            for i in (1, 2, 3)
+        }
         self._close_clients: dict[int, rclpy.client.Client] = {
             i: self.create_client(Trigger, f'ball_dropper/close_actuator_{i}')
             for i in (1, 2, 3)
@@ -90,10 +95,22 @@ class LoadDropperCLI(Node):
         """Run the interactive loading sequence. Blocks until complete or aborted."""
         print()
         print('=== Ball Dropper — Loading Sequence ===')
-        print('All actuators will be opened.')
         print('Press Ctrl-C at any time to abort.')
         input('>> Press ENTER to open all actuators and start loading...')
 
+        # Step 0: open all actuators
+        for actuator_id in (1, 2, 3):
+            print(f'  Please wait — opening actuator {actuator_id}...')
+            if not self._call_trigger(
+                self._open_clients[actuator_id],
+                f'open_actuator_{actuator_id}',
+            ):
+                print('\nLoading aborted.')
+                return
+
+        print()
+
+        # Steps 1-3: load each ball then close its actuator
         for actuator_id, prompt in _LOAD_STEPS:
             print(prompt)
             input('  >> Press ENTER once the ball is in the tube...')
