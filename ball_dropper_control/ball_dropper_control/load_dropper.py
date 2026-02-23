@@ -90,8 +90,9 @@ class LoadDropperCLI(Node):
         """Run the interactive loading sequence. Blocks until complete or aborted."""
         print()
         print('=== Ball Dropper — Loading Sequence ===')
-        print('Make sure ALL actuators are open (dropper is empty) before continuing.')
-        print('Press Ctrl-C at any time to abort.\n')
+        print('All actuators will be opened.')
+        print('Press Ctrl-C at any time to abort.')
+        input('>> Press ENTER to open all actuators and start loading...')
 
         for actuator_id, prompt in _LOAD_STEPS:
             print(prompt)
